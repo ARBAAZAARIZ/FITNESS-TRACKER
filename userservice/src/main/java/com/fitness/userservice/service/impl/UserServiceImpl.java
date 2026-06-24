@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
          UserResponse response = new UserResponse();
 
-         if(userRepository.existByEmail(request.getEmail())){
+         if(userRepository.existsByEmail(request.getEmail())){
 
              response.setApiStatus(false);
              response.setMessage("Email already exist");
