@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -60,7 +63,17 @@ public class UserServiceImpl implements UserService {
         return  convertToResponse(user);
     }
 
+    @Override
+    public Object existByUserId(String userId) {
 
+         boolean exist = userRepository.existsById(userId);
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("apiStatus",true);
+        response.put("message",exist?"User exist":"User not exist");
+        response.put("data",exist);
+        return response;
+    }
 
 
     private UserResponse convertToResponse(User user) {
@@ -79,8 +92,5 @@ public class UserServiceImpl implements UserService {
 
         return response;
     }
-
-
-
 
 }

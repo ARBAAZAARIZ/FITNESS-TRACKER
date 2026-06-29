@@ -2,17 +2,19 @@ package com.fitness.fitnessActivity.dto;
 
 
 import com.fitness.fitnessActivity.model.ActivityType;
-import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Field;
+import lombok.Builder;
+import lombok.*;
+import lombok.RequiredArgsConstructor;
+
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ActivityReqRes {
 
 

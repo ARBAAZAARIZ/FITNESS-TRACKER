@@ -1,6 +1,7 @@
 package com.fitness.fitnessActivity.controller;
 
 import com.fitness.fitnessActivity.dto.ActivityReqRes;
+import com.fitness.fitnessActivity.dto.ApiResponse;
 import com.fitness.fitnessActivity.model.Activity;
 import com.fitness.fitnessActivity.repository.ActivityRepository;
 import com.fitness.fitnessActivity.service.ActivityService;
@@ -44,9 +45,25 @@ public class ActivityController {
     }
 
     @GetMapping
+    public ResponseEntity<?> getUserActivities(@RequestHeader("X-User-ID") String userId){
+        ApiResponse response = activityService.getUserActivity(userId);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @GetMapping("/{activityId}")
+    public ResponseEntity<?> getActivityById(@PathVariable  String activityId){
+        ActivityReqRes response = activityService.getActivityByID(activityId);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    /*@GetMapping
     public List<Activity> getAll() {
         return repository.findAll();
-    }
+    }*/
 
     @GetMapping("/count")
     public long count() {
