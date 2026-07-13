@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ActivityService {
 
-     ActivityReqRes trackActivity(ActivityReqRes request);
+     ActivityReqRes saveActivity(ActivityReqRes request);
     List<ActivityReqRes> findAllActivities ();
 
      ApiResponse getUserActivity(String userId);

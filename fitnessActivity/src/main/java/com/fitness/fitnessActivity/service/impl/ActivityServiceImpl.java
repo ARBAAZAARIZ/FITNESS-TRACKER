@@ -8,8 +8,11 @@ import com.fitness.fitnessActivity.model.Activity;
 import com.fitness.fitnessActivity.repository.ActivityRepository;
 import com.fitness.fitnessActivity.service.ActivityService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,20 +24,35 @@ import java.util.stream.Collectors;
 public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
-    ActivityRepository activityRepository;
+    private ActivityRepository activityRepository;
 
     @Autowired
-    UserInteractService userInteractService;
+    private UserInteractService userInteractService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
+    @Value("${rabbitmq.exchange.name}")
+    private String exchnage;
+
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
+
 
     @Override
-    public ActivityReqRes trackActivity(ActivityReqRes request){
+    @Transactional(value = "Exception.class")
+    public ActivityReqRes saveActivity(ActivityReqRes request){
         Map userResponse;
         try{
              userResponse = userInteractService.validateUser(request.getUserId());
         } catch (Exception e) {
+
+            log.info("Error On validating user -> ",e);
+
            return ActivityReqRes.builder()
                    .apiStatus(false)
-                   .message("Failed to validate user, please Login again " +
+                   .message("Something went wrong Failed to validate user, please Login again " +
                            "or if same problem occurs contact admin")
                    .build();
         }
@@ -60,9 +78,22 @@ public class ActivityServiceImpl implements ActivityService {
         try{
             Activity savedActivity = activityRepository.save(activity);
             if(savedActivity.getId()!=null){
+
                 response = mapToResponse(savedActivity);
                 response.setApiStatus(true);
                 response.setMessage("Activity tracked successfully");
+
+                // Publish to RabbitMq for AI Processing
+
+                try{
+                    rabbitTemplate.convertAndSend(exchnage,routingKey,response);
+
+                } catch (Exception e) {
+                    log.error("Failed to publish activity to RabbitMQ : ", e );
+
+                }
+
+
                 return response;
             }else{
                 response.setApiStatus(false);

@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.RequiredArgsConstructor;
 
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ActivityReqRes {
+public class ActivityReqRes implements Serializable {
 
 
     private String id;

@@ -38,7 +38,7 @@ public class ActivityController {
 
     @PostMapping
     public ResponseEntity<?> trackActivity(@RequestBody ActivityReqRes request){
-        ActivityReqRes response = activityService.trackActivity(request);
+        ActivityReqRes response = activityService.saveActivity(request);
 
         return ResponseEntity.ok(response);
 
