@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RecommendationServiceImpl implements RecommendationService {
+public class RecommendationServiceImpl /*implements RecommendationService */{
 
-
+/*
     @Autowired
     RecommendationRepository recommendationRepository;
 
@@ -99,7 +99,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         response.setCreatedAt(recommendation.getCreatedAt());
 
         return response;
-    }
+    }*/
 
 
 
