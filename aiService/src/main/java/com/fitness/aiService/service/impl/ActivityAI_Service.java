@@ -58,6 +58,9 @@ public class ActivityAI_Service {
         
         Provide detailed analysis focusing on performance, improvements, next workout suggestions, and safety guidelines.
         Ensure the response follows the EXACT JSON format shown above.
+        Return ONLY valid JSON.
+        Do not include markdown code fences.
+        Do not include any explanation outside the JSON.
         """,
                 activity.getType(),
                 activity.getDuration(),

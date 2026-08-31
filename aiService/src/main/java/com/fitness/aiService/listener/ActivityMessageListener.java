@@ -1,8 +1,10 @@
 package com.fitness.aiService.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fitness.aiService.dto.ResponseWrapper;
 import com.fitness.aiService.model.Activity;
 import com.fitness.aiService.model.Recommendation;
+import com.fitness.aiService.service.RecommendationService;
 import com.fitness.aiService.service.impl.ActivityAI_Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ public class ActivityMessageListener {
 
     private final ActivityAI_Service aiService;
 
+    private final RecommendationService recommendationService;
+
 
     private final ObjectMapper objectMapper;
 
@@ -36,7 +40,19 @@ public class ActivityMessageListener {
 
             Recommendation recommendation = objectMapper.readValue(aiResponse, Recommendation.class);
 
+            recommendation.setActivityId(activity.getId());
+            recommendation.setUserId(activity.getUserId());
+            recommendation.setActivityType(activity.getType().toString());
+
             log.info("Recommendation generated: {}", recommendation);
+
+            ResponseWrapper responseWrapper = recommendationService.saveRecommendation(recommendation);
+
+            if(responseWrapper.isApiStatus()){
+                log.info("Recommendation saved successfully");
+            }else{
+                log.error("Failed to save recommendation");
+            }
 
         } catch (Exception e) {
 

@@ -14,7 +14,39 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RecommendationServiceImpl /*implements RecommendationService */{
+public class RecommendationServiceImpl implements RecommendationService {
+
+    @Autowired
+    RecommendationRepository recommendationRepository;
+
+    @Override
+    public ResponseWrapper getUserRecommendations(String userId) {
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper getActivityRecommendation(String activityId) {
+        return null;
+    }
+
+    @Override
+    public ResponseWrapper saveRecommendation(Recommendation recommendation) {
+
+        Recommendation savedRecommendation = recommendationRepository.save(recommendation);
+
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+
+        if( savedRecommendation.getId() != null ){
+
+            responseWrapper.setApiStatus(true);
+            responseWrapper.setMessage("Recommendation saved successfully");
+            return responseWrapper;
+        }
+
+        responseWrapper.setApiStatus(false);
+        responseWrapper.setMessage("Failed to save recommendation");
+        return responseWrapper;
+    }
 
 /*
     @Autowired
