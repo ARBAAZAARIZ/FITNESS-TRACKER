@@ -10,6 +10,7 @@
         <module name="aiService" />
         <module name="fitnessActivity" />
         <module name="eureka" />
+        <module name="configServer" />
         <module name="userservice" />
       </profile>
     </annotationProcessing>
@@ -21,6 +22,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="activityservice" options="-parameters" />
       <module name="aiService" options="-parameters" />
+      <module name="configServer" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="fitnessActivity" options="-parameters" />
       <module name="userservice" options="-parameters" />
