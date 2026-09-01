@@ -11,6 +11,7 @@
         <module name="fitnessActivity" />
         <module name="eureka" />
         <module name="configServer" />
+        <module name="gateway" />
         <module name="userservice" />
       </profile>
     </annotationProcessing>
@@ -25,6 +26,7 @@
       <module name="configServer" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="fitnessActivity" options="-parameters" />
+      <module name="gateway" options="-parameters" />
       <module name="userservice" options="-parameters" />
     </option>
   </component>
