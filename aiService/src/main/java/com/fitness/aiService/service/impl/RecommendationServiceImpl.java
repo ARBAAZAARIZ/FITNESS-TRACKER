@@ -1,7 +1,7 @@
 package com.fitness.aiService.service.impl;
 
 
-import com.fitness.aiService.dto.RecommendationReqResDTO;
+import com.fitness.aiService.dto.RecommendationResponse;
 import com.fitness.aiService.dto.ResponseWrapper;
 import com.fitness.aiService.model.Recommendation;
 import com.fitness.aiService.repository.RecommendationRepository;
@@ -19,15 +19,9 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Autowired
     RecommendationRepository recommendationRepository;
 
-    @Override
-    public ResponseWrapper getUserRecommendations(String userId) {
-        return null;
-    }
 
-    @Override
-    public ResponseWrapper getActivityRecommendation(String activityId) {
-        return null;
-    }
+
+
 
     @Override
     public ResponseWrapper saveRecommendation(Recommendation recommendation) {
@@ -48,91 +42,113 @@ public class RecommendationServiceImpl implements RecommendationService {
         return responseWrapper;
     }
 
-/*
-    @Autowired
-    RecommendationRepository recommendationRepository;
-
     @Override
-    public ResponseWrapper getUserRecommendations(String userId){
+    public ResponseWrapper getUserRecommendations(String userId) {
 
-        ResponseWrapper responseWrapper = new ResponseWrapper();
+        List<Recommendation> recommendations = recommendationRepository.findByUserId(userId);
 
-        try{
-            List<Recommendation> recommendations = recommendationRepository.findByUserId(userId);
+        List<RecommendationResponse> responseRecommendationData = recommendations
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
 
-            List<RecommendationReqResDTO> responseRecommendationData =
-                    recommendations
-                            .stream()
-                            .map(recommendation->mapToResponse(recommendation))
-                            .toList();
-
-            responseWrapper.setData(responseRecommendationData);
-            responseWrapper.setApiStatus(true);
-            responseWrapper.setMessage("Recommendations fetched successfully");
-            return responseWrapper;
-
-        } catch (Exception e) {
-            responseWrapper.setApiStatus(false);
-            responseWrapper.setMessage("Failed to fetch recommendations");
-            return responseWrapper;
-        }
+        return new ResponseWrapper(
+                "Recommendations fetched successfully",
+                true,
+                responseRecommendationData
+        );
     }
 
-    @Override
-    public ResponseWrapper getActivityRecommendation(String activityId){
+    private RecommendationResponse mapToResponse(Recommendation recommendation){
 
-        ResponseWrapper responseWrapper = new ResponseWrapper();
+        RecommendationResponse response = new RecommendationResponse();
 
-        try{
-            Recommendation recommendation = recommendationRepository.findByActivityId(activityId).orElseThrow(
-                    () -> new RuntimeException("Recommendation not found for activityId: " + activityId)
-            );
-
-            RecommendationReqResDTO responseRecommendationData =mapToResponse(recommendation);
-
-            responseWrapper.setData(responseRecommendationData);
-            responseWrapper.setApiStatus(true);
-            responseWrapper.setMessage("Recommendations fetched successfully");
-            return responseWrapper;
-
-        } catch (RuntimeException e) {
-            responseWrapper.setApiStatus(false);
-            responseWrapper.setMessage("Failed to fetch recommendations");
-            return responseWrapper;
-        }
-    }
-
-    private Recommendation mapToModel(RecommendationReqResDTO dto) {
-
-        return Recommendation.builder()
-                .id(dto.getId())
-                .activityId(dto.getActivityId())
-                .userId(dto.getUserId())
-                .activityType(dto.getActivityType())
-                .recommendation(dto.getRecommendation())
-                .improvement(dto.getImprovement())
-                .suggestions(dto.getSuggestions())
-                .safety(dto.getSafety())
-                .createdAt(dto.getCreatedAt())
-                .build();
-    }
-    private RecommendationReqResDTO mapToResponse(Recommendation recommendation) {
-
-        RecommendationReqResDTO response = new RecommendationReqResDTO();
-
+        // Basic Information
         response.setId(recommendation.getId());
         response.setActivityId(recommendation.getActivityId());
         response.setUserId(recommendation.getUserId());
         response.setActivityType(recommendation.getActivityType());
-        response.setRecommendation(recommendation.getRecommendation());
-        response.setImprovement(recommendation.getImprovement());
-        response.setSuggestions(recommendation.getSuggestions());
-        response.setSafety(recommendation.getSafety());
         response.setCreatedAt(recommendation.getCreatedAt());
 
-        return response;
-    }*/
+        // Analysis
+        if(recommendation.getAnalysis() != null){
 
+            RecommendationResponse.AnalysisDTO analysis = new RecommendationResponse.AnalysisDTO();
+            analysis.setOverall(recommendation.getAnalysis().getOverall());
+            analysis.setPace(recommendation.getAnalysis().getPace());
+            analysis.setHeartRate(recommendation.getAnalysis().getHeartRate());
+            analysis.setCaloriesBurned(recommendation.getAnalysis().getCaloriesBurned());
+            response.setAnalysis(analysis);
+        }
+
+        // Improvements
+        if(recommendation.getImprovements() != null){
+            List<RecommendationResponse.ImprovementDTO> improvements =
+                    recommendation.getImprovements()
+                            .stream().map(imp->{
+                                RecommendationResponse.ImprovementDTO  improvement =
+                                        new RecommendationResponse.ImprovementDTO();
+                                improvement.setRecommendation(imp.getRecommendation());
+                                improvement.setArea(imp.getArea());
+                                return improvement;
+
+                            }).toList();
+            response.setImprovements(improvements);
+        }
+
+        // Suggestions
+        if(recommendation.getSuggestions() != null){
+
+            List<RecommendationResponse.SuggestionDTO> suggestions = recommendation.getSuggestions()
+                    .stream()
+                    .map(sugg->{
+
+                        RecommendationResponse.SuggestionDTO  suggestion =
+                                new RecommendationResponse.SuggestionDTO();
+
+                        suggestion.setWorkout(sugg.getWorkout());
+                        suggestion.setDescription(sugg.getDescription());
+                        return suggestion;
+
+                    }).toList();
+            response.setSuggestions(suggestions);
+        }
+
+        // Safety
+        if(recommendation.getSafety() != null){
+            List<String> safety = recommendation.getSafety();
+            response.setSafety(safety);
+        }
+
+        return response;
+
+    }
+
+
+    @Override
+    public ResponseWrapper getActivityRecommendation(String activityId) {
+
+       Optional <Recommendation> recommendationOptional =  recommendationRepository.findByActivityId(activityId);
+
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+
+        if (recommendationOptional.isEmpty()) {
+            responseWrapper.setApiStatus(false);
+            responseWrapper.setMessage(
+                    "No recommendation found for activity: " + activityId
+            );
+            return responseWrapper;
+        }
+        RecommendationResponse response =
+                mapToResponse(recommendationOptional.get());
+
+        responseWrapper.setApiStatus(true);
+        responseWrapper.setMessage("Recommendation fetched successfully");
+        responseWrapper.setData(response);
+
+        return responseWrapper;
+
+    }
 
 
 }

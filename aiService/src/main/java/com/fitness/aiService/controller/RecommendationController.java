@@ -5,6 +5,7 @@ import com.fitness.aiService.service.RecommendationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,12 +18,12 @@ public class RecommendationController {
 
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserRecommendations(String userId){
+    public ResponseEntity<?> getUserRecommendations(@PathVariable String userId){
          return ResponseEntity.ok(recommendationService.getUserRecommendations(userId));
     }
 
     @GetMapping("/activity/{activityId}")
-    public ResponseEntity<?> getActivityRecommendation(String activityId){
+    public ResponseEntity<?> getActivityRecommendation(@PathVariable String activityId){
         return ResponseEntity.ok(recommendationService.getActivityRecommendation(activityId));
     }
 
