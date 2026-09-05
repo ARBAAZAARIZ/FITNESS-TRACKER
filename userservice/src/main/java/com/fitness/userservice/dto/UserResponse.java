@@ -13,6 +13,7 @@ public class UserResponse {
     private String firstName;
     private String lastName;
     private UserRole role = UserRole.USER;
+    private Boolean enabled;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private Boolean apiStatus;

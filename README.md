@@ -5,6 +5,8 @@ This Application Tracks your activity and give awesome recommendation.
 To start the rabit mq run this command but u must have docker on your sysytem --   
     [docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4-management]
 
+To start the keyclock run this command 
+    [docker run -p 127.0.0.1:8080:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.7.3 start-dev]
 
 ------------------------------------------------
 eureka server is running on localhost:8761
@@ -138,6 +140,217 @@ response of AI
 "Listen to your body for signs of dizziness, chest pain, or extreme fatigue, and stop the activity immediately if these occur."
 ]
 }
+
+CustomUserDetailsService
+
+Spring Security
+↓
+UserDetailsService
+↓
+UserRepository
+↓
+PostgreSQL
+
+
+Manual Signup
+
+{
+"name": "Arbaaz",
+"email": "arbaaz@example.com",
+"password": "Password@123"
+}
+
+POST /signup
+↓
+AuthController
+↓
+AuthService
+↓
+Check email exists
+↓
+PasswordEncoder
+↓
+Hash password
+↓
+Create User
+↓
+UserRepository
+↓
+PostgreSQL
+
+database stores
+email = arbaaz@example.com
+password = $2a$10$........
+
+
+Manual Login
+POST /api/auth/login
+{
+"email": "arbaaz@example.com",
+"password": "Password@123"
+}
+Login Request
+↓
+AuthController
+↓
+AuthService
+↓
+AuthenticationManager
+↓
+AuthenticationProvider
+↓
+UserDetailsService
+↓
+Database
+↓
+PasswordEncoder
+↓
+Password matches?
+↓
+YES
+↓
+Generate Access Token
++
+Generate Refresh Token
+↓
+Return tokens
+
+{
+"accessToken": "eyJ...",
+"refreshToken": "eyJ...",
+"tokenType": "Bearer",
+"expiresIn": 900
+}
+
+Access Token vs Refresh Token
+
+Access Token
+Short-lived. 15 minutes
+
+Authorization: Bearer <access-token>
+
+Refresh Token
+Longer-lived.  7 days
+
+Access Token expires
+↓
+Frontend sends Refresh Token
+↓
+Auth Service validates refresh token
+↓
+Generate new Access Token
+
+
+Access Token
+= permission slip for API calls
+
+Refresh Token
+= ticket to obtain another access token
+
+Refresh Token 1
+↓
+Refresh request
+↓
+Validate RT1
+↓
+Invalidate RT1
+↓
+Generate RT2
++
+Generate AT2
+
+
+Database:
+RefreshToken
+-------------------------
+id
+token
+userId
+expiresAt
+revoked
+createdAt
+
+RT1 → revoked
+RT2 → active
+
+-----------------------JWT Structure----------------------
+
+A JWT contains:
+HEADER
+.
+PAYLOAD
+.
+SIGNATURE
+
+eyJhbGciOiJSUzI1NiJ9
+.
+eyJzdWIiOiJ1c2VyLTEyMyJ9
+.
+signature
+
+Payload might contain:
+
+{
+"sub": "user-123",
+"email": "arbaaz@example.com",
+"role": "USER",
+"iat": 1750000000,
+"exp": 1750000900
+}
+
+The signature allows the receiver to verify that the token hasn't been tampered with.
+
+
+Final architecture
+
+                         ┌─────────────────┐
+                         │    FRONTEND     │
+                         └────────┬────────┘
+                                  │
+                 ┌────────────────┴────────────────┐
+                 │                                 │
+                 ▼                                 ▼
+          Email/Password                         Google
+                 │                                 │
+                 └────────────────┬────────────────┘
+                                  ▼
+                         ┌─────────────────┐
+                         │   AUTH SERVICE  │
+                         │      :8084      │
+                         └────────┬────────┘
+                                  │
+                         ┌────────┴────────┐
+                         ▼                 ▼
+                    PostgreSQL        JWT Service
+                         │                 │
+                         │           Private Key
+                         │                 │
+                         └────────┬────────┘
+                                  │
+                              JWT Token
+                                  │
+                                  ▼
+                         ┌─────────────────┐
+                         │  API GATEWAY    │
+                         │      :8080      │
+                         └────────┬────────┘
+                                  │
+                    ┌─────────────┼─────────────┐
+                    ▼             ▼             ▼
+               User Service Activity Service AI Service
+                  :8081          :8082          :8083
+                    │              │
+                    ▼              ▼
+               PostgreSQL        MongoDB
+                                   │
+                                   ▼
+                                RabbitMQ
+                                   │
+                                   ▼
+                                Gemini
+
+
+
 
 ![img.png](img.png)
 
