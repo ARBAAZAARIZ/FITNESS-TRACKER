@@ -11,7 +11,7 @@ To start the keyclock run this command
 ------------------------------------------------
 eureka server is running on localhost:8761
 
-
+Gemini api key - [AQ.Ab8RN6K2nld-e_qptGGasXIsjKpus0WlaR418Ez-dtJETARJJwy]
 -----------------------------------
 gemini api request body 
 
@@ -353,7 +353,22 @@ Final architecture
 
 
 ![img.png](img.png)
-
+                Spring Security
+                            │
+                ┌───────────┴───────────┐
+                ▼                       ▼
+                UserDetailsService       PasswordEncoder
+                │                       │
+                │                       │
+                ▼                       ▼
+                Find user                Verify password
+                │                       │
+                └───────────┬───────────┘
+                            ▼
+                AuthenticationProvider
+                            │
+                            ▼
+                AuthenticationManager
 
 # 🏋️ Fitness Tracker
 

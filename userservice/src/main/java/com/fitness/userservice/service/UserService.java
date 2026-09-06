@@ -14,4 +14,6 @@ public interface UserService {
     public UserResponse getUserProfile(String userId);
 
     Object existByUserId(String userId);
+
+    UserResponse getUserByEmail(String email);
 }

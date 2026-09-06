@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
 
        if(savedUser.getId()!=null){
 
+           response.setId(savedUser.getId());
            response.setApiStatus(true);
            response.setMessage("User registered successfully");
            return response;
@@ -72,6 +73,19 @@ public class UserServiceImpl implements UserService {
         response.put("apiStatus",true);
         response.put("message",exist?"User exist":"User not exist");
         response.put("data",exist);
+        return response;
+    }
+
+    @Override
+    public UserResponse getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found")
+                );
+
+        UserResponse response = convertToResponse(user);
+        response.setPassword(user.getPassword());
+
         return response;
     }
 

@@ -1,6 +1,7 @@
 package com.fitness.userservice.controller;
 
 import com.fitness.userservice.dto.RegisterRequest;
+import com.fitness.userservice.dto.UserResponse;
 import com.fitness.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/register")
+    @PostMapping("internal/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request){
         return ResponseEntity.ok(userService.register(request));
     }
@@ -29,6 +30,13 @@ public class UserController {
     @GetMapping("/validate/{userId}")
     public ResponseEntity<?> validateUser(@PathVariable String userId){
         return ResponseEntity.ok(userService.existByUserId(userId));
+    }
+
+    @GetMapping("/internal/email/{email}")
+    public UserResponse getUserByEmail(
+            @PathVariable String email) {
+
+        return userService.getUserByEmail(email);
     }
 
 }
