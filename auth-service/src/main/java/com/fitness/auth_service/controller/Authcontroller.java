@@ -1,9 +1,11 @@
 package com.fitness.auth_service.controller;
 
 import com.fitness.auth_service.dto.CreateUserRequest;
+import com.fitness.auth_service.dto.LoginRequest;
 import com.fitness.auth_service.dto.ResponseWrapper;
 import com.fitness.auth_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,9 +18,18 @@ public class Authcontroller {
     private UserService userService;
 
     @PostMapping("/signup")
-    public ResponseWrapper createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<?> createUser(@RequestBody CreateUserRequest request) {
         System.out.println("creating user");
-        return userService.createUser(request);
+
+        return  ResponseEntity.ok( userService.createUser(request));
+    }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(
+            @RequestBody LoginRequest request) {
+
+        return ResponseEntity.ok(userService.login(request));
     }
 
 }

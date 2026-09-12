@@ -55,6 +55,7 @@ public class SecurityConfig {
         return provider;
     }
 
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationProvider authenticationProvider ){
         return new ProviderManager(authenticationProvider);
     }

@@ -13,3 +13,4 @@ public class AuthServiceApplication {
 	}
 
 }
+1
