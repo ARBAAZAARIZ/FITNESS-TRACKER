@@ -61,20 +61,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseWrapper login(LoginRequest request) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        System.out.println(">>> Login request received for: " + request.getEmail());
 
-        // Authentication successful
-        ResponseWrapper response = new ResponseWrapper();
+        try {
 
-        response.setApiStatus(true);
-        response.setMessage("Login successful");
-        response.setData(null);
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    request.getEmail(),
+                                    request.getPassword()
+                            )
+                    );
 
-        return null;
+            System.out.println(">>> Authentication successful");
+
+            ResponseWrapper response = new ResponseWrapper();
+            response.setApiStatus(true);
+            response.setMessage("Login successful");
+
+            return response;
+
+        } catch (Exception e) {
+
+            System.out.println(">>> Authentication failed: "
+                    + e.getClass().getName());
+
+            System.out.println(">>> Message: " + e.getMessage());
+
+            throw e;
+        }
     }
 }
