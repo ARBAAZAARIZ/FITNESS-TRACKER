@@ -2,6 +2,7 @@ package com.fitness.auth_service.service.impl;
 
 import com.fitness.auth_service.config.UserServiceClient;
 import com.fitness.auth_service.dto.*;
+import com.fitness.auth_service.exception.BadCredentialException;
 import com.fitness.auth_service.exception.CustomException;
 import com.fitness.auth_service.model.RefreshToken;
 import com.fitness.auth_service.repository.UserRepository;
@@ -11,6 +12,7 @@ import com.fitness.auth_service.service.RefreshTokenService;
 import com.fitness.auth_service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -108,7 +110,12 @@ public class UserServiceImpl implements UserService {
 
             return response;
 
-        } catch (Exception e) {
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialException(
+                    "Invalid email or password"
+            );
+        }
+        catch (Exception e) {
 
             System.out.println(">>> Authentication failed: "
                     + e.getClass().getName());

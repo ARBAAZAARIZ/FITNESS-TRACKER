@@ -1,5 +1,8 @@
 package com.fitness.auth_service.service;
 
+import com.fitness.auth_service.exception.InvalidRefreshTokenException;
+import com.fitness.auth_service.exception.RefreshTokenExpiredException;
+import com.fitness.auth_service.exception.RefreshTokenRevokedException;
 import com.fitness.auth_service.model.RefreshToken;
 import com.fitness.auth_service.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -94,20 +97,20 @@ public class RefreshTokenService {
         RefreshToken refreshToken =
                 refreshTokenRepository.findByTokenHash(tokenHash)
                         .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Invalid refresh token"
+                                new InvalidRefreshTokenException(
+                                        "INVALID_REFRESH_TOKEN"
                                 )
                         );
 
         if (Boolean.TRUE.equals(refreshToken.getRevoked())) {
-            throw new IllegalArgumentException(
-                    "Refresh token has been revoked"
+            throw new RefreshTokenRevokedException(
+                    "REFRESH_TOKEN_REVOKED"
             );
         }
 
         if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException(
-                    "Refresh token has expired"
+            throw new RefreshTokenExpiredException(
+                    "TOKEN_EXPIRED"
             );
         }
 
