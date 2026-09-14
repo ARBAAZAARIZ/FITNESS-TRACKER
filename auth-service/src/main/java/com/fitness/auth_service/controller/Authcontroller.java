@@ -1,8 +1,6 @@
 package com.fitness.auth_service.controller;
 
-import com.fitness.auth_service.dto.CreateUserRequest;
-import com.fitness.auth_service.dto.LoginRequest;
-import com.fitness.auth_service.dto.ResponseWrapper;
+import com.fitness.auth_service.dto.*;
 import com.fitness.auth_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +28,11 @@ public class Authcontroller {
             @RequestBody LoginRequest request) {
 
         return ResponseEntity.ok(userService.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public LoginResponse refreshAccessToken(@RequestBody RefreshTokenRequest request) {
+        return userService.refreshAccessToken(request.getRefreshToken());
     }
 
 }

@@ -87,5 +87,32 @@ public class RefreshTokenService {
 
     }
 
+    public RefreshToken validateRefreshToken(String rawRefreshToken) {
+
+        String tokenHash = hashToken(rawRefreshToken);
+
+        RefreshToken refreshToken =
+                refreshTokenRepository.findByTokenHash(tokenHash)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Invalid refresh token"
+                                )
+                        );
+
+        if (Boolean.TRUE.equals(refreshToken.getRevoked())) {
+            throw new IllegalArgumentException(
+                    "Refresh token has been revoked"
+            );
+        }
+
+        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException(
+                    "Refresh token has expired"
+            );
+        }
+
+        return refreshToken;
+
+    }
 
 }

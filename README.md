@@ -400,6 +400,54 @@ Login page
 
 ![JWT-Flow.png](../../../Users/MD%20ARBAAZ%20ALAM/Downloads/JWT-Flow.png)
 
+                     CLIENT
+                        │
+                        │ email + password
+                        ▼
+                ┌───────────────┐
+                │  API GATEWAY  │
+                └───────┬───────┘
+                        │
+                        ▼
+                 ┌─────────────┐
+                 │ AUTH SERVICE│
+                 └──────┬──────┘
+                        │
+                        ▼
+              AuthenticationManager
+                        │
+                        ▼
+              DaoAuthenticationProvider
+                        │
+                        ▼
+              CustomUserDetailsService
+                        │
+                        ▼
+                   User Service
+                        │
+                        ▼
+                   PostgreSQL
+                        │
+                        ▼
+                  Authentication
+                     SUCCESS
+                        │
+             ┌──────────┴──────────┐
+             ▼                     ▼
+       JwtService          RefreshTokenService
+             │                     │
+      RSA Private Key            SHA-256
+             │                     │
+             ▼                     ▼
+       Access JWT             Hash → DB
+        15 minutes              7 days
+             │                     │
+             └──────────┬──────────┘
+                        ▼
+                   LoginResponse
+                        │
+                        ▼
+                     CLIENT
 
 # 🏋️ Fitness Tracker
 

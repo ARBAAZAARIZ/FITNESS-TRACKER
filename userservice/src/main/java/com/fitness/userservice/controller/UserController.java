@@ -15,14 +15,14 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/{userId}")
+    @GetMapping("/internal/{userId}")
     public ResponseEntity<?> getUserProfile(@PathVariable String userId){
 
         return ResponseEntity.ok(userService.getUserProfile(userId));
     }
 
 
-    @PostMapping("internal/register")
+    @PostMapping("/internal/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request){
         return ResponseEntity.ok(userService.register(request));
     }

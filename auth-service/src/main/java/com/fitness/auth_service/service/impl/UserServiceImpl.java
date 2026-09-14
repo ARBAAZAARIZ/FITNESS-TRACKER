@@ -3,6 +3,7 @@ package com.fitness.auth_service.service.impl;
 import com.fitness.auth_service.config.UserServiceClient;
 import com.fitness.auth_service.dto.*;
 import com.fitness.auth_service.exception.CustomException;
+import com.fitness.auth_service.model.RefreshToken;
 import com.fitness.auth_service.repository.UserRepository;
 import com.fitness.auth_service.security.CustomUserDetails;
 import com.fitness.auth_service.security.JwtService;
@@ -116,5 +117,39 @@ public class UserServiceImpl implements UserService {
 
             throw e;
         }
+    }
+
+    @Override
+    public LoginResponse refreshAccessToken(String rawRefreshToken) {
+
+        RefreshToken refreshToken =
+                refreshTokenService.validateRefreshToken(
+                        rawRefreshToken
+                );
+
+        UserResponse user =
+                userServiceClient.getUserById(
+                        refreshToken.getUserId()
+                );
+
+        CustomUserDetails userDetails = new CustomUserDetails(
+                user.getId(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getRole(),
+                user.getEnabled()
+        );
+
+        String newAccessToken =
+                jwtService.generateToken(userDetails);
+
+        return new LoginResponse(
+                true,
+                "Access token refreshed successfully",
+                newAccessToken,
+                null,
+                user.getId(),
+                user.getEmail()
+        );
     }
 }

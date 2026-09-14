@@ -17,4 +17,8 @@ public interface UserServiceClient {
 
     @GetMapping("/api/users/internal/email/{email}")
     UserResponse getUserByEmail( @PathVariable("email") String email);
+
+    @GetMapping("/api/users/internal/{userId}")
+    UserResponse getUserById( @PathVariable("userId") String id);
+
 }

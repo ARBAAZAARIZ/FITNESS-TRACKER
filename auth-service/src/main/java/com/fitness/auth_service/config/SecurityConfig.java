@@ -29,7 +29,8 @@ public class SecurityConfig {
                     .requestMatchers("/hello").permitAll()
                     .requestMatchers(
                             "/api/auth/signup",
-                                     "/api/auth/login"
+                                     "/api/auth/login",
+                                     "/api/auth/refresh"
                     ).permitAll()
                     .anyRequest().authenticated()
 
