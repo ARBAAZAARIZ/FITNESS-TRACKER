@@ -370,6 +370,37 @@ Final architecture
                             ▼
                 AuthenticationManager
 
+Access Token
+│
+▼
+Gateway validates JWT
+│
+├── VALID ───────────────► Continue request ✅
+│
+├── EXPIRED ─────────────► 401 + TOKEN_EXPIRED
+│                              │
+│                              ▼
+│                         Frontend interceptor
+│                              │
+│                         Refresh Token
+│                              │
+│                              ▼
+│                         New Access Token
+│
+└── MALFORMED / TAMPERED ─► 401 + TOKEN_INVALID
+│
+▼
+❌ NO refresh
+│
+▼
+Clear session
+│
+▼
+Login page
+
+![JWT-Flow.png](../../../Users/MD%20ARBAAZ%20ALAM/Downloads/JWT-Flow.png)
+
+
 # 🏋️ Fitness Tracker
 
 ## AI-Powered Fitness Tracking System using Spring Boot Microservices

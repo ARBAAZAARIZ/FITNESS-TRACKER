@@ -1,12 +1,12 @@
 package com.fitness.auth_service.service.impl;
 
 import com.fitness.auth_service.config.UserServiceClient;
-import com.fitness.auth_service.dto.CreateUserRequest;
-import com.fitness.auth_service.dto.LoginRequest;
-import com.fitness.auth_service.dto.ResponseWrapper;
-import com.fitness.auth_service.dto.UserResponse;
+import com.fitness.auth_service.dto.*;
 import com.fitness.auth_service.exception.CustomException;
 import com.fitness.auth_service.repository.UserRepository;
+import com.fitness.auth_service.security.CustomUserDetails;
+import com.fitness.auth_service.security.JwtService;
+import com.fitness.auth_service.service.RefreshTokenService;
 import com.fitness.auth_service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +28,10 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
+
+    private final JwtService jwtService;
+
+    private final RefreshTokenService refreshTokenService;
 
 
     @Override
@@ -75,9 +79,31 @@ public class UserServiceImpl implements UserService {
 
             System.out.println(">>> Authentication successful");
 
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            String accessToken = jwtService.generateToken(userDetails);
+
+            String refreshToken =
+                    refreshTokenService.createRefreshToken(
+                            userDetails.getId()
+                    );
+
+            LoginResponse loginResponse =
+                    new LoginResponse(
+                            true,
+                            "Login successful",
+                            accessToken,
+                            refreshToken,
+                            userDetails.getId(),
+                            userDetails.getEmail()
+                    );
+
+
+
             ResponseWrapper response = new ResponseWrapper();
             response.setApiStatus(true);
             response.setMessage("Login successful");
+            response.setData(loginResponse);
 
             return response;
 
