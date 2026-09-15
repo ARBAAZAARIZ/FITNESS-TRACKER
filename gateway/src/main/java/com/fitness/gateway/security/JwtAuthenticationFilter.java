@@ -1,16 +1,22 @@
 package com.fitness.gateway.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 
 @Component
@@ -18,6 +24,8 @@ import reactor.core.publisher.Mono;
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private final JwtValidationService jwtValidationService;
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -101,8 +109,35 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .set(HttpHeaders.CONTENT_TYPE,
                         "application/json");
 
-        return exchange.getResponse()
-                .setComplete();
+        Map<String, Object> body = Map.of(
+                "apiStatus",false,
+                "message",message,
+                "code",code
+
+        );
+
+        try {
+
+            String json =
+                    objectMapper.writeValueAsString(body);
+
+            byte[] bytes =
+                    json.getBytes(StandardCharsets.UTF_8);
+
+            DataBuffer buffer =
+                    exchange.getResponse()
+                            .bufferFactory()
+                            .wrap(bytes);
+
+            return exchange.getResponse()
+                    .writeWith(Mono.just(buffer));
+
+        } catch (JsonProcessingException e) {
+
+            return exchange.getResponse()
+                    .setComplete();
+        }
+
     }
 
 }

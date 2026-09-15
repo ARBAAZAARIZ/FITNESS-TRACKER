@@ -9,7 +9,7 @@ import com.fitness.auth_service.repository.UserRepository;
 import com.fitness.auth_service.security.CustomUserDetails;
 import com.fitness.auth_service.security.JwtService;
 import com.fitness.auth_service.service.RefreshTokenService;
-import com.fitness.auth_service.service.UserService;
+import com.fitness.auth_service.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
 
@@ -158,5 +158,10 @@ public class UserServiceImpl implements UserService {
                 user.getId(),
                 user.getEmail()
         );
+    }
+
+    @Override
+    public void logout(String rawRefreshToken) {
+        refreshTokenService.revokeRefreshToken(rawRefreshToken);
     }
 }

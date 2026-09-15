@@ -118,4 +118,22 @@ public class RefreshTokenService {
 
     }
 
+
+    public void revokeRefreshToken(String rawToken){
+        String tokenHash = hashToken(rawToken);
+
+        RefreshToken refreshToken =
+                refreshTokenRepository.findByTokenHash(tokenHash)
+                        .orElseThrow(() ->
+                                new InvalidRefreshTokenException(
+                                        "Invalid refresh token"
+                                )
+                        );
+
+        refreshToken.setRevoked(true);
+
+        refreshTokenRepository.save(refreshToken);
+
+    }
+
 }
