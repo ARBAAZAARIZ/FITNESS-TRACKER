@@ -5,6 +5,7 @@ import com.fitness.auth_service.exception.RefreshTokenExpiredException;
 import com.fitness.auth_service.exception.RefreshTokenRevokedException;
 import com.fitness.auth_service.model.RefreshToken;
 import com.fitness.auth_service.repository.RefreshTokenRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -133,6 +134,21 @@ public class RefreshTokenService {
         refreshToken.setRevoked(true);
 
         refreshTokenRepository.save(refreshToken);
+
+    }
+
+
+    @Transactional
+    public String rotateRefreshToken(RefreshToken currentToken){
+
+        int updatedRow =
+                refreshTokenRepository.revokeIfActive(currentToken.getId(),LocalDateTime.now());
+
+        if(updatedRow != 1){
+            throw new InvalidRefreshTokenException("Refresh Token is no longer active");
+        }
+
+        return createRefreshToken(currentToken.getUserId());
 
     }
 

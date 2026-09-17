@@ -10,6 +10,7 @@ import com.fitness.auth_service.security.CustomUserDetails;
 import com.fitness.auth_service.security.JwtService;
 import com.fitness.auth_service.service.RefreshTokenService;
 import com.fitness.auth_service.service.AuthService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -129,14 +130,16 @@ public class UserServiceImpl implements AuthService {
     @Override
     public LoginResponse refreshAccessToken(String rawRefreshToken) {
 
-        RefreshToken refreshToken =
+        // 1. Validate the incoming refresh token
+        RefreshToken currentRefreshToken =
                 refreshTokenService.validateRefreshToken(
                         rawRefreshToken
                 );
 
+        // 2. Get current user information
         UserResponse user =
                 userServiceClient.getUserById(
-                        refreshToken.getUserId()
+                        currentRefreshToken.getUserId()
                 );
 
         CustomUserDetails userDetails = new CustomUserDetails(
@@ -147,14 +150,20 @@ public class UserServiceImpl implements AuthService {
                 user.getEnabled()
         );
 
+        // 3. Revoke old refresh token
+        //    and create a new refresh token
+        String newRefreshToken = refreshTokenService.rotateRefreshToken(currentRefreshToken);
+
+        // 4. Generate new access token
         String newAccessToken =
                 jwtService.generateToken(userDetails);
 
+        // 5. Return BOTH new tokens
         return new LoginResponse(
                 true,
                 "Access token refreshed successfully",
                 newAccessToken,
-                null,
+                newRefreshToken,
                 user.getId(),
                 user.getEmail()
         );
@@ -164,4 +173,5 @@ public class UserServiceImpl implements AuthService {
     public void logout(String rawRefreshToken) {
         refreshTokenService.revokeRefreshToken(rawRefreshToken);
     }
+
 }

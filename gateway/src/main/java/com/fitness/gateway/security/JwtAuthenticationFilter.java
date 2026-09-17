@@ -93,7 +93,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     private boolean isPublicEndpoint(String path){
         return path.equals("/api/auth/login")
                 || path.equals("/api/auth/signup")
-                || path.equals("/api/auth/refresh");
+                || path.equals("/api/auth/refresh")
+                || path.equals("/api/auth/logout");
     }
 
     private Mono<Void> unauthorized(
