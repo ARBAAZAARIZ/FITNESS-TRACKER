@@ -4,6 +4,7 @@ import com.fitness.auth_service.config.UserServiceClient;
 import com.fitness.auth_service.dto.*;
 import com.fitness.auth_service.exception.BadCredentialException;
 import com.fitness.auth_service.exception.CustomException;
+import com.fitness.auth_service.exception.LoginPasswordNotEnabledException;
 import com.fitness.auth_service.model.RefreshToken;
 import com.fitness.auth_service.repository.UserRepository;
 import com.fitness.auth_service.security.CustomUserDetails;
@@ -70,6 +71,24 @@ public class UserServiceImpl implements AuthService {
     public ResponseWrapper login(LoginRequest request) {
 
         System.out.println(">>> Login request received for: " + request.getEmail());
+
+        // Step 1: Fetch the user from User Service
+        UserResponse user;
+
+        try {
+            user = userServiceClient.getUserByEmail(request.getEmail());
+        } catch (feign.FeignException.NotFound e) {
+            // Keep unknown accounts indistinguishable from wrong passwords
+            throw new BadCredentialException("Invalid email or password");
+        }
+
+
+        // Step 2: Check whether password login is enabled
+        if (Boolean.FALSE.equals(user.getPasswordLoginEnabled())) {
+            throw new LoginPasswordNotEnabledException(
+                    "Password login is not enabled. Please continue with Google or set a password."
+            );
+        }
 
         try {
 

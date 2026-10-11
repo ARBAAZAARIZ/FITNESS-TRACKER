@@ -12,6 +12,9 @@ To start the keyclock run this command
 eureka server is running on localhost:8761
 
 Gemini api key - [AQ.Ab8RN6K2nld-e_qptGGasXIsjKpus0WlaR418Ez-dtJETARJJwy]
+client-id: ${GOOGLE_CLIENT_ID}
+client-secret: ${GOOGLE_CLIENT_SECRET}
+http://localhost:8084/oauth2/authorization/google
 -----------------------------------
 gemini api request body 
 

@@ -38,4 +38,14 @@ public class User {
     private LocalDateTime updateAt;
 
 
+    /*Determines whether the account is allowed to authenticate using email and password.*/
+    @Column(name = "password_login_enabled", nullable = false)
+    private Boolean passwordLoginEnabled = true;
+
+
+    /*Stores Google's stable user identifier from the OIDC sub claim,
+    allowing us to associate the account with its Google identity.*/
+    @Column(name = "google_subject", unique = true)
+    private String googleSubject;
+
 }

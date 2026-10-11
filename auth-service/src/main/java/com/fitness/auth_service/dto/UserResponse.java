@@ -21,6 +21,8 @@ public class UserResponse {
     private Boolean apiStatus;
     private String message;
 
+    private Boolean passwordLoginEnabled;
+
 
 
 }

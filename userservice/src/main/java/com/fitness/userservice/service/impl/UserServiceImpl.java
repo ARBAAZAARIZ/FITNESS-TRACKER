@@ -41,6 +41,8 @@ public class UserServiceImpl implements UserService {
          user.setPassword(request.getPassword());
          user.setFirstName(request.getFirstName());
          user.setLastName(request.getLastName());
+         user.setPasswordLoginEnabled(request.getPasswordLoginEnabled()!=null?request.getPasswordLoginEnabled():true);
+         user.setGoogleSubject(request.getGoogleSubject());
 
        User savedUser = userRepository.save(user);
 
@@ -104,6 +106,7 @@ public class UserServiceImpl implements UserService {
         response.setCreateAt(user.getCreateAt());
         response.setUpdateAt(user.getUpdateAt());
         response.setApiStatus(true);
+        response.setPasswordLoginEnabled(user.getPasswordLoginEnabled());
         response.setMessage("User found successfully");
 
         return response;

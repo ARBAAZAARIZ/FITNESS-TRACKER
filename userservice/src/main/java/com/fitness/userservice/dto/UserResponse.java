@@ -18,4 +18,6 @@ public class UserResponse {
     private LocalDateTime updateAt;
     private Boolean apiStatus;
     private String message;
+    // Login configuration
+    private Boolean passwordLoginEnabled;
 }

@@ -86,5 +86,20 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    @ExceptionHandler(LoginPasswordNotEnabledException.class)
+    public ResponseEntity<ErrorResponse> handleNotEnabledPasswordLogin(
+            LoginPasswordNotEnabledException ex){
+
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.getMessage(),
+                false,"PASSWORD_NOT_ENABLED"
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+
+    }
 
 }
