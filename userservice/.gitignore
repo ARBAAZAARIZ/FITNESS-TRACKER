@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Google OAuth credentials
+Google-OAuth_2.O_credentials.json
+
+# Local environment variables
+.env
